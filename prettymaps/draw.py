@@ -564,12 +564,6 @@ def draw_text(params: Dict[str, dict], background: BaseGeometry) -> None:
     # Override default osm_credit dict with provided parameters
     params = override_params(
         dict(
-            text="\n".join(
-                [
-                    "data © OpenStreetMap contributors",
-                    "github.com/marceloprates/prettymaps",
-                ]
-            ),
             x=0,
             y=1,
             horizontalalignment="left",
@@ -579,7 +573,7 @@ def draw_text(params: Dict[str, dict], background: BaseGeometry) -> None:
         ),
         params,
     )
-    x, y, text = [params.pop(k) for k in ["x", "y", "text"]]
+    x, y = [params.pop(k) for k in ["x", "y"]]
 
     # Get background bounds
     xmin, ymin, xmax, ymax = background.bounds
