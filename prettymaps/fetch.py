@@ -45,7 +45,7 @@ def get_boundary(query, radius, circle=False, rotation=0):
         lat, lon = ox.geocode(query)
 
     # project to local UTM
-    point_gdf = gp.GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
+    point_gdf = GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
     point_gdf = ox.project_gdf(point_gdf)
 
     if circle:
