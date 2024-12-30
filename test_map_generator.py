@@ -21,7 +21,7 @@ def test_output_dir():
 def default_map_params():
     """Return default parameters for map generation."""
     return {
-        'location': 'San Francisco, CA',
+        'address': 'San Francisco, CA',  # Changed from 'location' to 'address'
         'radius': 200,
         'circle': True
     }
@@ -33,7 +33,11 @@ def test_plot_default_map(test_output_dir, default_map_params):
     
     try:
         # Generate the plot
-        fig, ax = plot(**default_map_params)
+        fig, ax = plot(
+            default_map_params['address'],  # Pass address as first positional argument
+            radius=default_map_params['radius'],
+            circle=default_map_params['circle']
+        )
         
         # Save the figure
         fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
@@ -55,7 +59,7 @@ def test_plot_invalid_location(test_output_dir):
     
     with pytest.raises(Exception):
         fig, ax = plot(
-            location='ThisIsNotARealLocation12345',
+            'ThisIsNotARealLocation12345',
             radius=200,
             circle=True
         )
@@ -63,14 +67,18 @@ def test_plot_invalid_location(test_output_dir):
 
 def test_plot_different_radius(test_output_dir, default_map_params):
     """Test map generation with different radius values."""
-    params = default_map_params.copy()
+    address = default_map_params['address']
+    circle = default_map_params['circle']
     
     for radius in [100, 500]:
         output_path = test_output_dir / f"test_radius_{radius}.svg"
-        params['radius'] = radius
         
         try:
-            fig, ax = plot(**params)
+            fig, ax = plot(
+                address,
+                radius=radius,
+                circle=circle
+            )
             fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
             
             assert output_path.exists(), f"Output file not found at {output_path}"
@@ -108,7 +116,9 @@ def test_plot_with_custom_style(test_output_dir, default_map_params):
         }
         
         fig, ax = plot(
-            **default_map_params,
+            default_map_params['address'],
+            radius=default_map_params['radius'],
+            circle=default_map_params['circle'],
             layers=layers
         )
         
