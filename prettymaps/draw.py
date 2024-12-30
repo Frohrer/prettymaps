@@ -662,6 +662,7 @@ def plot(
     scale_x=1,
     scale_y=1,
     rotation=0,
+    vsk=None,
 ):
     """
     Draw a map from OpenStreetMap data or a custom user-provided GeoDataFrame boundary.
@@ -759,27 +760,29 @@ def plot(
 
     # 8. Plot layers
     if mode == "plotter":
+        # Check if vsketch or vsk is missing
         if (vsketch is None) or (vsk is None):
-            raise ValueError("Plotter mode requires vsketch to be installed and imported.")
+            raise ValueError("Plotter mode requires vsketch and a valid 'vsk' object.")
+
         class Sketch(vsketch.SketchClass):
-            def draw(self, vsk: vsketch.Vsketch):
-                vsk.size("a4", landscape=True)
+            def draw(self, _vsk: vsketch.Vsketch):
+                _vsk.size("a4", landscape=True)
                 for layer_name, layer_params in layers.items():
                     if layer_name in gdfs:
                         plot_gdf(
                             layer_name,
                             gdfs[layer_name],
-                            ax,  # Not really used in plotter mode
+                            ax,  # Not used in plotter mode
                             width=layer_params.get("width"),
                             mode="plotter",
-                            vsk=vsk,
+                            vsk=_vsk,  # pass the local _vsk or the outer vsk
                             **(style.get(layer_name, {}))
                         )
                 if save_as:
-                    vsk.save(save_as)
+                    _vsk.save(save_as)
 
-            def finalize(self, vsk: vsketch.Vsketch):
-                vsk.vpype("linemerge linesimplify reloop linesort")
+            def finalize(self, _vsk: vsketch.Vsketch):
+                _vsk.vpype("linemerge linesimplify reloop linesort")
 
         sketch = Sketch()
         sketch.display()
