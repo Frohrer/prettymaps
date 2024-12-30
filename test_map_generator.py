@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')  # Set non-interactive backend
 import logging
 from pathlib import Path
-from map_generator import generate_map
+from prettymaps.draw import plot
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -27,36 +27,41 @@ def default_map_params():
     }
 
 # Tests
-def test_generate_default_map(test_output_dir, default_map_params):
-    """Test generating a map with default style."""
+def test_plot_default_map(test_output_dir, default_map_params):
+    """Test plotting a map with default style."""
     output_path = test_output_dir / "test_default.svg"
     
-    success = generate_map(
-        **default_map_params,
-        output_path=str(output_path)
-    )
-    
-    # Assertions
-    assert success, "Map generation failed"
-    assert output_path.exists(), f"Output file not found at {output_path}"
-    assert output_path.stat().st_size > 0, "Generated file is empty"
-    
-    logger.info(f"Successfully generated map at {output_path}")
-    logger.info(f"File size: {output_path.stat().st_size} bytes")
+    try:
+        # Generate the plot
+        fig, ax = plot(**default_map_params)
+        
+        # Save the figure
+        fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
+        
+        # Assertions
+        assert output_path.exists(), f"Output file not found at {output_path}"
+        assert output_path.stat().st_size > 0, "Generated file is empty"
+        
+        logger.info(f"Successfully generated map at {output_path}")
+        logger.info(f"File size: {output_path.stat().st_size} bytes")
+        
+    except Exception as e:
+        logger.error(f"Error during map generation: {str(e)}")
+        raise
 
-def test_generate_map_invalid_location(test_output_dir):
+def test_plot_invalid_location(test_output_dir):
     """Test map generation with invalid location."""
     output_path = test_output_dir / "test_invalid.svg"
     
     with pytest.raises(Exception):
-        generate_map(
+        fig, ax = plot(
             location='ThisIsNotARealLocation12345',
             radius=200,
-            circle=True,
-            output_path=str(output_path)
+            circle=True
         )
+        fig.savefig(output_path, format='svg')
 
-def test_generate_map_different_radius(test_output_dir, default_map_params):
+def test_plot_different_radius(test_output_dir, default_map_params):
     """Test map generation with different radius values."""
     params = default_map_params.copy()
     
@@ -64,11 +69,56 @@ def test_generate_map_different_radius(test_output_dir, default_map_params):
         output_path = test_output_dir / f"test_radius_{radius}.svg"
         params['radius'] = radius
         
-        success = generate_map(
-            **params,
-            output_path=str(output_path)
+        try:
+            fig, ax = plot(**params)
+            fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
+            
+            assert output_path.exists(), f"Output file not found at {output_path}"
+            assert output_path.stat().st_size > 0, f"Generated file is empty for radius {radius}"
+            
+            logger.info(f"Successfully generated map with radius {radius}")
+            
+        except Exception as e:
+            logger.error(f"Error generating map with radius {radius}: {str(e)}")
+            raise
+
+def test_plot_with_custom_style(test_output_dir, default_map_params):
+    """Test plotting with custom style parameters."""
+    output_path = test_output_dir / "test_custom_style.svg"
+    
+    try:
+        layers = {
+            'perimeter': {},
+            'streets': {
+                'custom_filter': '["highway"~"motorway|trunk|primary|secondary|tertiary|residential|service|unclassified"]',
+                'width': {
+                    'motorway': 5,
+                    'trunk': 4,
+                    'primary': 3,
+                    'secondary': 2,
+                    'tertiary': 1,
+                    'residential': 0.5,
+                    'service': 0.25,
+                    'unclassified': 0.25
+                }
+            },
+            'building': {'tags': {'building': True}},
+            'water': {'tags': {'natural': ['water', 'bay']}},
+            'green': {'tags': {'landuse': ['grass', 'park'], 'natural': ['wood']}}
+        }
+        
+        fig, ax = plot(
+            **default_map_params,
+            layers=layers
         )
         
-        assert success, f"Map generation failed for radius {radius}"
+        fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
+        
         assert output_path.exists(), f"Output file not found at {output_path}"
-        assert output_path.stat().st_size > 0, f"Generated file is empty for radius {radius}"
+        assert output_path.stat().st_size > 0, "Generated file is empty"
+        
+        logger.info(f"Successfully generated custom styled map at {output_path}")
+        
+    except Exception as e:
+        logger.error(f"Error during custom style map generation: {str(e)}")
+        raise
