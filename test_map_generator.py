@@ -21,9 +21,8 @@ def test_output_dir():
 def default_map_params():
     """Return default parameters for map generation."""
     return {
-        'address': 'San Francisco, CA',  # Changed from 'location' to 'address'
-        'radius': 200,
-        'circle': True
+        'address': 'San Francisco, CA',
+        'radius': 200
     }
 
 # Tests
@@ -34,9 +33,8 @@ def test_plot_default_map(test_output_dir, default_map_params):
     try:
         # Generate the plot
         fig, ax = plot(
-            default_map_params['address'],  # Pass address as first positional argument
-            radius=default_map_params['radius'],
-            circle=default_map_params['circle']
+            default_map_params['address'],
+            radius=default_map_params['radius']
         )
         
         # Save the figure
@@ -60,15 +58,13 @@ def test_plot_invalid_location(test_output_dir):
     with pytest.raises(Exception):
         fig, ax = plot(
             'ThisIsNotARealLocation12345',
-            radius=200,
-            circle=True
+            radius=200
         )
         fig.savefig(output_path, format='svg')
 
 def test_plot_different_radius(test_output_dir, default_map_params):
     """Test map generation with different radius values."""
     address = default_map_params['address']
-    circle = default_map_params['circle']
     
     for radius in [100, 500]:
         output_path = test_output_dir / f"test_radius_{radius}.svg"
@@ -76,8 +72,7 @@ def test_plot_different_radius(test_output_dir, default_map_params):
         try:
             fig, ax = plot(
                 address,
-                radius=radius,
-                circle=circle
+                radius=radius
             )
             fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
             
@@ -96,7 +91,7 @@ def test_plot_with_custom_style(test_output_dir, default_map_params):
     
     try:
         layers = {
-            'perimeter': {},
+            'perimeter': {},  # Empty dict for default perimeter settings
             'streets': {
                 'custom_filter': '["highway"~"motorway|trunk|primary|secondary|tertiary|residential|service|unclassified"]',
                 'width': {
@@ -118,7 +113,6 @@ def test_plot_with_custom_style(test_output_dir, default_map_params):
         fig, ax = plot(
             default_map_params['address'],
             radius=default_map_params['radius'],
-            circle=default_map_params['circle'],
             layers=layers
         )
         
@@ -131,4 +125,34 @@ def test_plot_with_custom_style(test_output_dir, default_map_params):
         
     except Exception as e:
         logger.error(f"Error during custom style map generation: {str(e)}")
+        raise
+
+def test_plot_circular_perimeter(test_output_dir, default_map_params):
+    """Test plotting with circular perimeter."""
+    output_path = test_output_dir / "test_circular.svg"
+    
+    try:
+        layers = {
+            'perimeter': {'circle': True},  # Set circular perimeter in layers
+            'streets': {},
+            'building': {'tags': {'building': True}},
+            'water': {'tags': {'natural': ['water', 'bay']}},
+            'green': {'tags': {'landuse': ['grass', 'park'], 'natural': ['wood']}}
+        }
+        
+        fig, ax = plot(
+            default_map_params['address'],
+            radius=default_map_params['radius'],
+            layers=layers
+        )
+        
+        fig.savefig(output_path, format='svg', bbox_inches='tight', pad_inches=0)
+        
+        assert output_path.exists(), f"Output file not found at {output_path}"
+        assert output_path.stat().st_size > 0, "Generated file is empty"
+        
+        logger.info(f"Successfully generated circular perimeter map")
+        
+    except Exception as e:
+        logger.error(f"Error during circular perimeter map generation: {str(e)}")
         raise
