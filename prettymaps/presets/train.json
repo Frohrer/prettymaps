@@ -1,0 +1,84 @@
+{
+    "layers": {
+        "perimeter": {},
+        "train_lines": {
+            "tags": {
+                "railway": [
+                    "rail",
+                    "light_rail",
+                    "subway",
+                    "tram"
+                ]
+            }
+        },
+        "train_stations": {
+            "tags": {
+                "railway": "station"
+            }
+        },
+        "train_platforms": {
+            "tags": {
+                "railway": "platform"
+            }
+        }
+    },
+    "style": {
+        "perimeter": {
+            "fill": false,
+            "lw": 0,
+            "zorder": 0
+        },
+        "background": {
+            "dilate": 20,
+            "fc": "#F5F5F5",
+            "zorder": -1
+        },
+        "train_lines": {
+            "fc": "none",
+            "ec": {
+                "railway": {
+                    "rail": "#FF0000",
+                    "light_rail": "#0000FF",
+                    "subway": "#00FF00",
+                    "tram": "#FFA500"
+                }
+            },
+            "lw": {
+                "railway": {
+                    "rail": 3,
+                    "light_rail": 2,
+                    "subway": 2,
+                    "tram": 1.5
+                }
+            },
+            "zorder": 3
+        },
+        "train_stations": {
+            "fc": "#FFFFFF",
+            "ec": "#000000",
+            "lw": 1,
+            "marker": "o",
+            "markersize": 5,
+            "zorder": 4
+        },
+        "train_platforms": {
+            "fc": "#DDDDDD",
+            "ec": "#000000",
+            "lw": 0.5,
+            "zorder": 2
+        }
+    },
+    "radius": false,
+    "name_field": "name",
+    "text": {
+        "train_stations": {
+            "field": "name",
+            "fontsize": 8,
+            "offset": [
+                0,
+                5
+            ],
+            "zorder": 5
+        }
+    }
+}
