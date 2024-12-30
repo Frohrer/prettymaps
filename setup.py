@@ -7,12 +7,12 @@ presets_dir = os.path.abspath(os.path.join(os.path.pardir, "presets"))
 
 setup(
     name="prettymaps",
-    version="v1.3.0",
+    version="v1.3.1",
     description="A simple python library to draw pretty maps from OpenStreetMap data",
     long_description=parent_dir.joinpath("README.md").read_text(),
     long_description_content_type="text/markdown",
-    url="https://github.com/marceloprates/prettymaps",
-    author="Marcelo Prates",
+    url="https://github.com/Frohrer/prettymaps",
+    author="Marcelo Prates (Original) - Frederic Rohrer (Fork)",
     author_email="marceloorp@gmail.com",
     license="MIT License",
     packages=find_packages(exclude=("assets", "notebooks", "prints", "script")),
