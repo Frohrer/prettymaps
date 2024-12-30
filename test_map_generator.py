@@ -23,7 +23,7 @@ def test_plot_sf_map(test_output_dir):
     
     try:
         # Generate the plot using exact coordinates
-        fig, ax = plot(
+        fig = plot(
             (37.79072260209851, -122.39110457256962),
             radius=200,
             circle=True,
